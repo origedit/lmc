@@ -1,0 +1,37 @@
+; compare two numbers
+; and print the biggest number
+
+in
+st	a
+st	cmp_a
+in
+st	b
+st	cmp_b
+
+loop:
+ld	cmp_a	; dec cmp_a
+bz	a<=b
+sub	one
+st	cmp_a
+ld	cmp_b	; dec cmp_b
+bz	b<=a
+sub	one
+st	cmp_b
+br	loop
+
+a<=b:
+ld	b
+out
+end
+
+b<=a:
+ld	a
+out
+end
+
+data!
+one	1
+a	?
+b	?
+cmp_a	?
+cmp_b	?

@@ -1,0 +1,20 @@
+input:
+in
+bz	input	; repeat if A = 0
+st	count	; A -> count
+
+loop:
+ld	i	; i -> A
+out
+add	one	; i + 1
+st	i
+ld	count	; count - 1
+sub	one
+st	count
+bp	loop	; repeat if count > 0
+end
+
+data!
+one	1
+i	1
+count	?

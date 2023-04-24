@@ -1,0 +1,19 @@
+; use this file with run.sh to run the program immediately
+
+; print the fibonacci sequence until the number is too big
+
+loop:
+ld	a
+out
+add	b
+st	temp
+ld	a
+st	b
+ld	temp
+st	a
+br	loop
+
+data!
+a	1
+b	0
+temp	?
