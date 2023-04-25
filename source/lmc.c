@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 enum format_type {FOR_DEC, FOR_BIN};
+bool str_comp(char a[], char b[]);  // non-stadard function for fun
 
 #include "lmc-asm.c"
 #include "lmc-emu.c"
@@ -15,8 +16,6 @@ enum format_type {FOR_DEC, FOR_BIN};
 static int argc2;
 static char **argv2;
 static int argi;
-
-bool str_comp(char a[], char b[]);  // non-stadard function for fun
 static char *arg();
 
 int main(int argc, char **argv) {

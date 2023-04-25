@@ -1,14 +1,14 @@
-#define WORD_LEN 32
-#define LABELS_N 100
-#define LABEL_INSTANCES_N 100
-#define	MNEMONICS_N 10
-#define DIRECTIVES_N 2
+#define ASM_WORD_LEN 32
+#define ASM_LABELS_N 100
+#define ASM_LABEL_INSTANCES_N 100
+#define	ASM_MNEMONICS_N 10
+#define ASM_DIRECTIVES_N 2
 
 static const struct {
 	char  name[4];
 	short code;
 	bool arg;
-} mnemonics[MNEMONICS_N] = {
+} mnemonics[ASM_MNEMONICS_N] = {
 	{"end", 000, false},
 	{"add", 100, true},
 	{"sub", 200, true},
@@ -20,7 +20,7 @@ static const struct {
 	{"in",  901, false},
 	{"out", 902, false}
 };
-static const char directives[DIRECTIVES_N][5] = {
+static const char directives[ASM_DIRECTIVES_N][5] = {
 	"code", "data"
 };
 static const char reserved_chars[] = ";:!?";
@@ -30,9 +30,9 @@ static int program_line;
 static short buffer[100];
 static unsigned char program_len;
 
-static char word[WORD_LEN];
+static char word[ASM_WORD_LEN];
 static unsigned char word_len;
-static enum { // kinda nonsense
+static enum {
 	PREV_NOTHING, PREV_COMMAND, PREV_OPERAND, PREV_LABEL
 } prev_word;
 static enum {
@@ -40,9 +40,9 @@ static enum {
 } mode;
 
 static struct label_type {
-	char name[WORD_LEN];
+	char name[ASM_WORD_LEN];
 	short place;
-} labels[LABELS_N], label_instances[LABEL_INSTANCES_N];;
+} labels[ASM_LABELS_N], label_instances[ASM_LABEL_INSTANCES_N];;
 static short labels_n;
 static short label_inst_n;
 
@@ -63,7 +63,6 @@ static inline void put_number(short place, short n);
 static bool add_label(char name[]);
 static bool put_label(char name[]);
 static inline bool insert_labels();
-extern bool str_comp(char a[], char b[]);
 
 int assemble(char source_filename[], char code_filename[], enum format_type format) {
 	FILE *source, *code;
@@ -107,7 +106,7 @@ int parse(FILE *source) {
 			if (!(match_char(read_char, reserved_chars) ||
 				match_char(read_char, spaces))
 			) {
-				if (word_len > WORD_LEN) {
+				if (word_len > ASM_WORD_LEN) {
 					error("long word");
 					return 1;
 				}
@@ -244,17 +243,16 @@ static inline void put_number(short place, short n) {
 
 static bool parse_code_word(char postfix) {
 	short meaning;  // could have been a union
-	for (meaning = 0; meaning < MNEMONICS_N; ++meaning)
+	for (meaning = 0; meaning < ASM_MNEMONICS_N; ++meaning)
 		if (str_comp(word, (char *) mnemonics[meaning].name))
 			break;
-	if (meaning < MNEMONICS_N) {
-		if (prev_word != PREV_NOTHING) {
+	if (meaning < ASM_MNEMONICS_N) {
+		if (prev_word == PREV_COMMAND) {
 			error("bad word order");
 			return 1;
 		}
 		put_opcode(program_len++, meaning);
-		if (mnemonics[meaning].arg)
-			prev_word = PREV_COMMAND;
+		prev_word = mnemonics[meaning].arg ? PREV_COMMAND : PREV_OPERAND;
 	} else if (is_digit(word[0])) {
 		if ((meaning = parse_number(word)) == -1) {
 			error("bad number");
@@ -310,7 +308,7 @@ static bool add_label(char name[]) {
 	for (i = 0; name[i]; ++i)
 		labels[labels_n].name[i] = name[i];
 	labels[labels_n].place = program_len;
-	if (++labels_n >= LABELS_N) {
+	if (++labels_n >= ASM_LABELS_N) {
 		error("too many labels");
 		return 1;
 	}
@@ -322,7 +320,7 @@ static bool put_label(char name[]) {
 	for (i = 0; name[i]; ++i)
 		label_instances[label_inst_n].name[i] = name[i];
 	label_instances[label_inst_n].place = program_len - 1;
-	if (++label_inst_n >= LABEL_INSTANCES_N) {
+	if (++label_inst_n >= ASM_LABEL_INSTANCES_N) {
 		error("too many labels");
 		return 1;
 	}
